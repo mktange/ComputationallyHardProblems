@@ -17,6 +17,8 @@ public class Driver {
 		}
 		
 		uwg.printMatrix();
+		System.out.println();
+		uwg.printEdges();
 	}
 	
 	
@@ -28,7 +30,7 @@ public class Driver {
 	private static String getFilename(String[] args) {
 		if (args.length > 0) return args[0];
 		
-		System.out.println("Enter the path to file (.uwg):");
+		System.out.print("Enter the path to file (.uwg): ");
 		Scanner in = new Scanner(System.in);
 		String filename = in.nextLine();
 		in.close();

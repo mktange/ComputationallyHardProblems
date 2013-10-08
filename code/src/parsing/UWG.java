@@ -6,11 +6,13 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 
 public class UWG {
 	private int n;
 	private int[][] matrix;
 	private int[] columnWidth;
+	private ArrayList<Edge> edges;
 	
 	public UWG(String filename) throws IOException {
 		File file = new File(filename);
@@ -22,8 +24,9 @@ public class UWG {
 		n = Integer.parseInt(br.readLine());
 		int m = Integer.parseInt(br.readLine());
 		
-		// Initialize adjacency matrix
+		// Initialize adjacency matrix and edge list
 		matrix = new int[n][n];
+		edges = new ArrayList<Edge>();
 		
 		// Pretty print, column width
 		columnWidth = new int[n];
@@ -42,6 +45,7 @@ public class UWG {
 			
 			matrix[x1][x2] = w;
 			matrix[x2][x1] = w;
+			edges.add(new Edge(x1, x2, w));
 			
 			// Update pretty print variables
 			if (parts[2].length() > columnWidth[x1]) columnWidth[x1] = parts[2].length();
@@ -62,6 +66,10 @@ public class UWG {
 	public int getEdge(int x1, int x2) {
 		return matrix[x1][x2];
 	}
+	
+	public Edge getEdge(int k) {
+		return edges.get(k);
+	}
 
 	public void printMatrix() {
 		for (int i = 0; i < matrix.length; i++) {
@@ -69,6 +77,17 @@ public class UWG {
 				System.out.printf("%"+columnWidth[j]+"d ", matrix[i][j]);
 			}
 			System.out.println();
+		}
+	}
+	
+	public void printEdges() {
+		Edge e;
+		for (int i = 0; i < edges.size(); i++) {
+			e = edges.get(i);
+			System.out.printf(
+					"e%d = {%d,%d}, w(e%d) = %d\n",
+					i+1, e.getN1()+1, e.getN2()+1, i+1, e.getWeight()
+					);
 		}
 	}
 }
