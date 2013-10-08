@@ -1,0 +1,60 @@
+\documentclass[11pt,a4paper]{report}
+\newcommand{\confdir}{conf/} % Set the folder which contains preamble.tex, titlepage.tex and the general img/ folder
+\newcommand{\imgdir}{img/} % Set the folder which contains the specific images for the report
+\newcommand{\texdir}{tex/} % Set the folder which contains the content (.tex files)
+\newcommand{\srcdir}{../code/src/} % Set the folder which contains the content (.tex files)
+\input{\confdir preamble}
+
+
+%%%%%%%%%%%
+%% SETUP %%
+%%%%%%%%%%%
+
+%% Set the course number and course name
+% Usage: \setcourse{<course no>}{<course name>}
+    \setcourse{02249}{Computationally Hard Problems}
+
+%% Set the title of the report
+% Usage: \settitle{<title>}
+    \settitle{Course Project}
+
+%% Set the subtitle of the report
+% Usage: \setsubtitle{<subtitle>}
+    \setsubtitle{Mirror Friendly Minimum Spanning Tree}
+
+%% Set the date the report is handed in
+% Usage: \setdate{<hand-in date>}
+    \setdate{November 4th 2013}
+
+%% Add the authors of the report
+% Usage: \addauthor{<study number>}{<first name(s)>}{<last name>}
+    \addauthor{s093255}{Mikkel Riber}{Bojsen}
+    \addauthor{s093280}{Martin Kasban}{Tange}
+
+%%%% END OF SETUP
+
+\begin{document}
+
+%% Insert titlepage
+\inserttitlepage
+
+%% Insert list of todos
+\listoftodos
+
+%% Insert table-of-contents
+\inserttoc
+
+%% Input files for the report
+\import{\texdir}{introduction}
+%\import{\texdir}{design}
+%\import{\texdir}{implementation}
+%\import{\texdir}{tests}
+%\import{\texdir}{conclusion}
+
+
+%\begin{appendix}
+%\input{\texdir code}
+%\end{appendix}
+
+
+\end{document}
