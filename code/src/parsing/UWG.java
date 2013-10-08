@@ -10,7 +10,7 @@ import java.io.InputStreamReader;
 public class UWG {
 	private int n;
 	private int[][] matrix;
-	private int[] maxLength;
+	private int[] columnWidth;
 	
 	public UWG(String filename) throws IOException {
 		File file = new File(filename);
@@ -18,13 +18,19 @@ public class UWG {
 		
 		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
 		
+		// Read in n and m
 		n = Integer.parseInt(br.readLine());
 		int m = Integer.parseInt(br.readLine());
 		
+		// Initialize adjacency matrix
 		matrix = new int[n][n];
-		maxLength = new int[n];
-		for (int i = 0; i < maxLength.length; i++) maxLength[i] = 1;
 		
+		// Pretty print, column width
+		columnWidth = new int[n];
+		for (int i = 0; i < columnWidth.length; i++) columnWidth[i] = 1;
+		
+		
+		// Read in edges
 		String[] parts;
 		int x1, x2, w;
 		for (int i = 0; i < m; i++) {
@@ -36,8 +42,10 @@ public class UWG {
 			
 			matrix[x1][x2] = w;
 			matrix[x2][x1] = w;
-			if (parts[2].length() > maxLength[x1]) maxLength[x1] = parts[2].length();
-			if (parts[2].length() > maxLength[x2]) maxLength[x2] = parts[2].length();
+			
+			// Update pretty print variables
+			if (parts[2].length() > columnWidth[x1]) columnWidth[x1] = parts[2].length();
+			if (parts[2].length() > columnWidth[x2]) columnWidth[x2] = parts[2].length();
 		}
 		
 		br.close();
@@ -58,7 +66,7 @@ public class UWG {
 	public void printMatrix() {
 		for (int i = 0; i < matrix.length; i++) {
 			for (int j = 0; j < matrix[0].length; j++) {
-				System.out.printf("%"+maxLength[j]+"d ", matrix[i][j]);
+				System.out.printf("%"+columnWidth[j]+"d ", matrix[i][j]);
 			}
 			System.out.println();
 		}

@@ -19,9 +19,16 @@ public class Driver {
 		uwg.printMatrix();
 	}
 	
+	
+	/**
+	 * Get a filename from either arguments or System.in
+	 * @param args
+	 * @return string
+	 */
 	private static String getFilename(String[] args) {
 		if (args.length > 0) return args[0];
 		
+		System.out.println("Enter the path to file (.uwg):");
 		Scanner in = new Scanner(System.in);
 		String filename = in.nextLine();
 		in.close();
