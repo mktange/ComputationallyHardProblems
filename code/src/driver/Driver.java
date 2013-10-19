@@ -4,11 +4,11 @@ import java.io.IOException;
 import java.util.Scanner;
 
 import parsing.UWG;
+import solver.Solution;
 import solver.Solver;
 
 public class Driver {
 
-	//Hej
 	public static void main(String[] args) {
 		UWG uwg = null;
 		try {
@@ -20,9 +20,12 @@ public class Driver {
 		
 		System.out.println("n: "+uwg.getN());
 		uwg.printEdges();
+		uwg.printNeighbours();
 		
 		System.out.println("Optimal solution: ");
-		System.out.println(Solver.solve(uwg));
+		Solution solution = Solver.solve(uwg);
+		System.out.println("================================");
+		System.out.println(solution);
 	}
 	
 	

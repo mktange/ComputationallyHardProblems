@@ -12,7 +12,7 @@ public class UWG {
 	private int n;
 	private int[] columnWidth;
 	private ArrayList<Edge> edges;
-	private ArrayList<Integer>[] neighbours; 
+	private ArrayList<Edge>[] neighbours; 
 	
 	@SuppressWarnings("unchecked")
 	public UWG(String filename) throws IOException {
@@ -33,7 +33,7 @@ public class UWG {
 		neighbours = new ArrayList[n];
 		for (int i = 0; i < n; i++) {
 			columnWidth[i] = 1;
-			neighbours[i] = new ArrayList<Integer>();
+			neighbours[i] = new ArrayList<Edge>();
 		}
 		
 		
@@ -50,8 +50,8 @@ public class UWG {
 			
 			e = new Edge(x1, x2, w);
 			edges.add(e);
-			neighbours[x1].add(x2);
-			neighbours[x2].add(x1);
+			neighbours[x1].add(e);
+			neighbours[x2].add(e);
 			
 			// Update pretty print variables
 			if (parts[2].length() > columnWidth[x1]) columnWidth[x1] = parts[2].length();
@@ -61,7 +61,7 @@ public class UWG {
 		br.close();
 	}
 	
-	public ArrayList<Integer> getNeighbours(int k) {
+	public ArrayList<Edge> getNeighbours(int k) {
 		return neighbours[k];
 	}
 	
@@ -101,6 +101,30 @@ public class UWG {
 					"e%d = {%d,%d}, w(e%d) = %d\n",
 					i+1, e.getN1()+1, e.getN2()+1, i+1, e.getWeight()
 					);
+		}
+	}
+	
+	public static String getCorrectedEdges(int i, ArrayList<Edge> neighbours) {
+		ArrayList<Integer> ints = new ArrayList<Integer>();
+		for (Edge e : neighbours) {
+			ints.add(e.getOther(i));
+		}
+		return getCorrectedEdges(ints);
+	}
+	
+	public static String getCorrectedEdges(ArrayList<Integer> neighbours) {
+		if (neighbours.isEmpty()) return "[]";
+		
+		String output = "";
+		for (Integer i : neighbours) {
+			output += (i+1)+", ";
+		}
+		return "["+output.substring(0,output.length()-2)+"]";
+	}
+
+	public void printNeighbours() {
+		for (int i = 0; i < neighbours.length; i++) {
+			System.out.println((i+1)+": "+UWG.getCorrectedEdges(i, neighbours[i]));
 		}
 	}
 }

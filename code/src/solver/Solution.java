@@ -2,11 +2,13 @@ package solver;
 
 import java.util.ArrayList;
 
-public class TreeAndB {
+import parsing.UWG;
+
+public class Solution {
 	int B;
 	ArrayList<Integer> edges;
 	
-	public TreeAndB(int B, ArrayList<Integer> edges, int lastEdge) {
+	public Solution(int B, ArrayList<Integer> edges, int lastEdge) {
 		this.B = B;
 		this.edges = new ArrayList<Integer>(edges);
 		this.edges.add(lastEdge);
@@ -20,7 +22,7 @@ public class TreeAndB {
 		return B;
 	}
 	
-	public static TreeAndB getBest(TreeAndB t1, TreeAndB t2) {
+	public static Solution getBest(Solution t1, Solution t2) {
 		if (t1 == null) return t2;
 		if (t2 == null) return t1;
 		if (t1.B < t2.B) {
@@ -36,15 +38,7 @@ public class TreeAndB {
 		return String.format(
 				"B: %d\nEdges: %s",
 				B,
-				getEdgeString()
+				UWG.getCorrectedEdges(edges)
 				);
-	}
-	
-	private String getEdgeString() {
-		String output = "[";
-		for (Integer i : edges) {
-			output += (i+1)+", ";
-		}
-		return output.substring(0,output.length()-2)+"]";
 	}
 }
