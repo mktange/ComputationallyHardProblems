@@ -10,10 +10,11 @@ import java.util.ArrayList;
 
 public class UWG {
 	private int n;
-	private int[][] matrix;
 	private int[] columnWidth;
 	private ArrayList<Edge> edges;
+	private ArrayList<Integer>[] neighbours; 
 	
+	@SuppressWarnings("unchecked")
 	public UWG(String filename) throws IOException {
 		File file = new File(filename);
 		if (!file.exists()) throw new FileNotFoundException();
@@ -24,18 +25,22 @@ public class UWG {
 		n = Integer.parseInt(br.readLine());
 		int m = Integer.parseInt(br.readLine());
 		
-		// Initialize adjacency matrix and edge list
-		matrix = new int[n][n];
+		// Initialize edge list
 		edges = new ArrayList<Edge>();
 		
 		// Pretty print, column width
 		columnWidth = new int[n];
-		for (int i = 0; i < columnWidth.length; i++) columnWidth[i] = 1;
+		neighbours = new ArrayList[n];
+		for (int i = 0; i < n; i++) {
+			columnWidth[i] = 1;
+			neighbours[i] = new ArrayList<Integer>();
+		}
 		
 		
 		// Read in edges
 		String[] parts;
 		int x1, x2, w;
+		Edge e;
 		for (int i = 0; i < m; i++) {
 			parts = br.readLine().split(" ");
 			
@@ -43,9 +48,10 @@ public class UWG {
 			x2 = Integer.parseInt(parts[1])-1;
 			w = Integer.parseInt(parts[2]);
 			
-			matrix[x1][x2] = w;
-			matrix[x2][x1] = w;
-			edges.add(new Edge(x1, x2, w));
+			e = new Edge(x1, x2, w);
+			edges.add(e);
+			neighbours[x1].add(x2);
+			neighbours[x2].add(x1);
 			
 			// Update pretty print variables
 			if (parts[2].length() > columnWidth[x1]) columnWidth[x1] = parts[2].length();
@@ -55,29 +61,36 @@ public class UWG {
 		br.close();
 	}
 	
-	public int[][] getMatrix() {
-		return matrix;
+	public ArrayList<Integer> getNeighbours(int k) {
+		return neighbours[k];
 	}
 	
 	public int getN() {
 		return n;
 	}
 	
-	public int getEdge(int x1, int x2) {
-		return matrix[x1][x2];
+	public ArrayList<Edge> getEdges() {
+		return edges;
+	}
+
+	public int countEdges() {
+		return edges.size();
 	}
 	
 	public Edge getEdge(int k) {
 		return edges.get(k);
 	}
-
-	public void printMatrix() {
-		for (int i = 0; i < matrix.length; i++) {
-			for (int j = 0; j < matrix[0].length; j++) {
-				System.out.printf("%"+columnWidth[j]+"d ", matrix[i][j]);
-			}
-			System.out.println();
-		}
+	
+	public Edge getMirrorEdge(int k) {
+		return this.getEdge(this.countEdges()-k-1);
+	}
+	
+	public int getW(int k) {
+		return getEdge(k).getWeight();
+	}
+	
+	public int getMirrorW(int k) {
+		return getMirrorEdge(k).getWeight();
 	}
 	
 	public void printEdges() {

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Scanner;
 
 import parsing.UWG;
+import solver.Solver;
 
 public class Driver {
 
@@ -17,9 +18,11 @@ public class Driver {
 			return;
 		}
 		
-		uwg.printMatrix();
-		System.out.println();
+		System.out.println("n: "+uwg.getN());
 		uwg.printEdges();
+		
+		System.out.println("Optimal solution: ");
+		System.out.println(Solver.solve(uwg));
 	}
 	
 	
@@ -31,11 +34,15 @@ public class Driver {
 	private static String getFilename(String[] args) {
 		if (args.length > 0) return args[0];
 		
-		System.out.print("Enter the path to file (.uwg): ");
+		System.out.print("Enter name of testfile: ");
 		Scanner in = new Scanner(System.in);
 		String filename = in.nextLine();
 		in.close();
 		
-		return filename;
+		if (!filename.endsWith(".uwg")) {
+			filename += ".uwg";
+		}
+		
+		return "testfiles/"+filename;
 	}
 }
