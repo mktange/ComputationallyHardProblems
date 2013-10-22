@@ -22,10 +22,14 @@ public class Driver {
 		uwg.printEdges();
 		uwg.printNeighbours();
 		
-		System.out.println("Optimal solution: ");
-		Solution solution = Solver.solve(uwg);
 		System.out.println("================================");
+		long start = System.currentTimeMillis();
+		Solution solution = Solver.solve(uwg);
+		long end = System.currentTimeMillis();
+		System.out.println("Optimal solution: ");
 		System.out.println(solution);
+		System.out.println();
+		System.out.println("Found in "+(end-start)/1000.0+" seconds");
 	}
 	
 	

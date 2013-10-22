@@ -96,13 +96,8 @@ public class UWG {
 	}
 	
 	public void printEdges() {
-		Edge e;
-		for (int i = 0; i < edges.size(); i++) {
-			e = edges.get(i);
-			System.out.printf(
-					"e%d = {%d,%d}, w(e%d) = %d\n",
-					i+1, e.getN1()+1, e.getN2()+1, i+1, e.getWeight()
-					);
+		for (Edge e : edges) {
+			System.out.println(e);
 		}
 	}
 	

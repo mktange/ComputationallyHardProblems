@@ -35,4 +35,12 @@ public class Edge {
 	public int getId() {
 		return id;
 	}
+	
+	@Override
+	public String toString() {
+		return String.format(
+				"e%d = {%d,%d}, w(e%d) = %d",
+				id+1, getN1()+1, getN2()+1, id+1, getWeight()
+				);
+	}
 }

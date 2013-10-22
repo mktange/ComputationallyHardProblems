@@ -10,8 +10,13 @@ public class Solution {
 	Set<Integer> edges;
 	
 	public Solution(int B, Set<Integer> edges) {
+		this(B);
+		this.edges.addAll(edges);
+	}
+	
+	public Solution(int B) {
 		this.B = B;
-		this.edges = new HashSet<Integer>(edges);
+		this.edges = new HashSet<Integer>();
 	}
 	
 	public Solution(int B, Set<Integer> edges, int lastEdge) {
@@ -36,6 +41,11 @@ public class Solution {
 		} else {
 			return t2;
 		}
+	}
+	
+	public boolean isBetterThan(int other) {
+		if (other >= this.B) return true;
+		return false;
 	}
 	
 	

@@ -7,125 +7,121 @@ import parsing.Edge;
 import parsing.UWG;
 
 public class Solver {
+	public static Solution best = new Solution(Integer.MAX_VALUE);
 	
-	public static Solution solve(UWG graph) {
-		return recursiveSolve(graph, 0, new HashSet<Integer>(), 0, 0);
+	public static boolean test(UWG graph) {
+		Set<Integer> set = new HashSet<Integer>();
+		for (int i = 0; i < 37; i++) {
+			set.add(i);
+		}
+		set.remove(3);
+		set.remove(8);
+		set.remove(10);
+		set.remove(22);
+		set.remove(25);
+		set.remove(27);
+		set.remove(29);
+		set.remove(34);
+		set.remove(37);
+		return hasLoop(graph, 37, set);
 	}
 	
-	private static Solution recursiveSolve(UWG graph, int k, Set<Integer> contracted, int st, int mot) {
-//		System.out.println("======================================");
-//		System.out.println("Current edge: "+(k+1));
-//		System.out.println("Contracted: "+UWG.getCorrectedEdges(contracted));
-//		System.out.println("ST: "+st);
-//		System.out.println("MOT: "+mot);
-//		System.out.println();
-		
-		if (hasLoop(graph, k, contracted)) {
-			return null;
+	public static Solution solve(UWG graph) {
+		recursiveSolve(graph, 0, new HashSet<Integer>(), 0, 0);
+		return best;
+	}
+	
+	private static void recursiveSolve(UWG graph, int k, Set<Integer> contracted, int st, int mot) {
+		// Stop if the current st/mot are too big compared to the current best
+		if (best.isBetterThan(Math.max(st,mot))) {
+			return;
 		}
 		
-		// If only two nodes are left
+		// Stop if the current graph contains a loop
+		if (hasLoop(graph, k, contracted)) {
+			return;
+		}
+		
+		// If only one nodes are left, is a solution
 		if (contracted.size() >= graph.getN()-1) {
-//			System.out.println("Only two nodes left!");
-			return new Solution(Math.max(st,mot), contracted);
+			best = new Solution(Math.max(st, mot), contracted);
+			return;
 		}
 		
 		// Check if graph is still connected
 		if (!isConnected(graph, k, contracted)) {
-//			System.out.println("Not a connected graph!");
-			return null;
-		} 
+			return;
+		}
 		
-		// Split to the left and right and find best of these two sets of spanning trees
-		Solution bestLeft = recursiveSolve(graph, k+1, new HashSet<Integer>(contracted), st, mot);
+		// Cut an edge and continue
+		recursiveSolve(graph, k+1, new HashSet<Integer>(contracted), st, mot);
 		
+		// Contract an edge and continue
 		HashSet<Integer> newContracted = new HashSet<Integer>(contracted);
 		newContracted.add(k);
-		Solution bestRight = recursiveSolve(graph, k+1, newContracted, st+graph.getW(k), mot+graph.getMirrorW(k));
-		
-		return Solution.getBest(bestLeft, bestRight);
+		recursiveSolve(graph, k+1, newContracted, st+graph.getW(k), mot+graph.getMirrorW(k));
 	}
 
 	private static boolean isConnected(UWG graph, int k, Set<Integer> contracted) {	
 		HashSet<Integer> explored = new HashSet<Integer>();
 		recursiveDFS(graph, k, contracted, explored, 0);
 		
-//		System.out.println("End explored: "+explored.size());
 		return explored.size() == graph.getN();
 	}
 	
 	private static void recursiveDFS(UWG graph, int k, Set<Integer> contracted, HashSet<Integer> explored, int node) {
-//		System.out.println("Explored "+(node+1));
 		explored.add(node);
 		
 		int other;
 		for (Edge edge : graph.getNeighbours(node)) {
 			other = edge.getOther(node);
 			
-//			System.out.printf("Trying %d -> %d", (node+1), (other+1));
 			// Skip node if already explored
 			if (explored.contains(other)) {
-//				System.out.println(", explored");
 				continue;
 			}
 			
 			// Skip edge to this node if it has been removed (not contracted)
 			if (graph.getEdges().indexOf(edge) < k && !contracted.contains(edge.getId())) {
-//				System.out.println(", WAS REMOVED");
 				continue;
 			}
-//			System.out.println();
 			
 			recursiveDFS(graph, k, contracted, explored, other);
 		}
 	}
 	
 	private static boolean hasLoop(UWG graph, int k, Set<Integer> contracted) {
+		if (contracted.isEmpty()) return false;
+		
 		HashSet<Integer> explored = new HashSet<Integer>();
-		return recursiveDFSloop(graph, k, contracted, explored, 0);
+		HashSet<Integer> exploredEdges = new HashSet<Integer>();
+		Edge e = graph.getEdge(contracted.iterator().next());
+
+		return recursiveDFSloop(graph, k, contracted, explored, exploredEdges, e.getN1());
 	}
 	
-	private static boolean recursiveDFSloop(UWG graph, int k, Set<Integer> contracted, HashSet<Integer> explored, int node) {
+	private static boolean recursiveDFSloop(UWG graph, int k, Set<Integer> contracted, HashSet<Integer> explored, 
+			HashSet<Integer> exploredEdges, int node) {
 		explored.add(node);
 		
 		int other;
 		for (Edge e : graph.getNeighbours(node)) {
-			if (!contracted.contains(e.getId()) || e.getId() < k) continue;
+			if (!contracted.contains(e.getId())) continue;
+			if (exploredEdges.contains(e.getId())) continue;
+			
+			exploredEdges.add(e.getId());
 			
 			other = e.getOther(node);
-			if (explored.contains(other)) return true;
+			if (explored.contains(other)) {
+				return true;
+			}
 			
-			return recursiveDFSloop(graph, k, contracted, explored, other);
-		}
-		
-		return false;
-	}
-
-	private static Solution findBestLink(UWG graph, int k, Set<Integer> contracted, int st, int mot) {
-		// In case no edges are left, return the current st/mot
-		if (k >= graph.countEdges()) {
-			System.err.println("BURDE IKKE NÅ HERTIL");
-			return null;
-		}
-		
-		// Find optimal spanning tree/mirror of tree pair
-		int best = Integer.MAX_VALUE;
-		int current;
-		int bestEdge = -1;
-		for (int i = k; i < graph.countEdges(); i++) {
-			current = Math.max(
-					st+graph.getEdge(i).getWeight(),
-					mot+graph.getMirrorEdge(i).getWeight());
-			
-			if (current < best)	{
-				best = current;
-				bestEdge = i;
+			if (recursiveDFSloop(graph, k, contracted, explored, exploredEdges, other)){
+				return true;
 			}
 		}
 		
-		System.out.println("Best link found to be "+(bestEdge+1)+" with the value "+best);
-		return new Solution(best, contracted, bestEdge);
-	}
-	
+		return false;
+	}	
 
 }
