@@ -1,9 +1,10 @@
 package parsing;
 
 public class Edge {
-	private int n1, n2, w;
+	private int id, n1, n2, w;
 
-	public Edge(int n1, int n2, int w) {
+	public Edge(int id, int n1, int n2, int w) {
+		this.id = id;
 		this.n1 = n1;
 		this.n2 = n2;
 		this.w = w;
@@ -29,5 +30,9 @@ public class Edge {
 	
 	public int getWeight() {
 		return w;
+	}
+	
+	public int getId() {
+		return id;
 	}
 }

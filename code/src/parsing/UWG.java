@@ -7,6 +7,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 
 public class UWG {
 	private int n;
@@ -48,7 +50,7 @@ public class UWG {
 			x2 = Integer.parseInt(parts[1])-1;
 			w = Integer.parseInt(parts[2]);
 			
-			e = new Edge(x1, x2, w);
+			e = new Edge(i, x1, x2, w);
 			edges.add(e);
 			neighbours[x1].add(e);
 			neighbours[x2].add(e);
@@ -104,7 +106,7 @@ public class UWG {
 		}
 	}
 	
-	public static String getCorrectedEdges(int i, ArrayList<Edge> neighbours) {
+	public static String getCorrectedEdges(int i, Collection<Edge> neighbours) {
 		ArrayList<Integer> ints = new ArrayList<Integer>();
 		for (Edge e : neighbours) {
 			ints.add(e.getOther(i));
@@ -112,11 +114,14 @@ public class UWG {
 		return getCorrectedEdges(ints);
 	}
 	
-	public static String getCorrectedEdges(ArrayList<Integer> neighbours) {
+	public static String getCorrectedEdges(Collection<Integer> neighbours) {
 		if (neighbours.isEmpty()) return "[]";
 		
+		ArrayList<Integer> sorted = new ArrayList<Integer>(neighbours);
+		Collections.sort(sorted);
+				
 		String output = "";
-		for (Integer i : neighbours) {
+		for (Integer i : sorted) {
 			output += (i+1)+", ";
 		}
 		return "["+output.substring(0,output.length()-2)+"]";

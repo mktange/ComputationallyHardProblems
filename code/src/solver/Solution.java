@@ -1,20 +1,26 @@
 package solver;
 
-import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import parsing.UWG;
 
 public class Solution {
 	int B;
-	ArrayList<Integer> edges;
+	Set<Integer> edges;
 	
-	public Solution(int B, ArrayList<Integer> edges, int lastEdge) {
+	public Solution(int B, Set<Integer> edges) {
 		this.B = B;
-		this.edges = new ArrayList<Integer>(edges);
+		this.edges = new HashSet<Integer>(edges);
+	}
+	
+	public Solution(int B, Set<Integer> edges, int lastEdge) {
+		this.B = B;
+		this.edges = new HashSet<Integer>(edges);
 		this.edges.add(lastEdge);
 	}
 	
-	public ArrayList<Integer> getEdges() {
+	public Set<Integer> getEdges() {
 		return edges;
 	}
 	
