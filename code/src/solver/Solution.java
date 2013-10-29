@@ -25,10 +25,6 @@ public class Solution {
 		this.edges.add(lastEdge);
 	}
 	
-	public Set<Integer> getEdges() {
-		return edges;
-	}
-	
 	public int getB() {
 		return B;
 	}

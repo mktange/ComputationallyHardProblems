@@ -1,0 +1,269 @@
+#include "CHP-comp.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+int n, m;
+Edge * edges;
+Item * items;
+Item ** nbs;
+Solution * best;
+
+char *contracted;
+int c_count;
+
+char *explored;
+int explored_count;
+
+int main(int argc, char ** argv) {
+	char * filename = getFilename(argc, argv);
+
+	if (readGraph(filename) == 0) {
+		printf("Failed to read input file: %s\n", filename);
+		fflush(stdout);
+		return EXIT_FAILURE;
+	}
+	free(filename);
+
+	// Initialize variables and arrays
+	best = malloc(sizeof(Solution));
+	best->B = 2147483647;
+	best->edges = malloc(m*sizeof(char));
+	c_count = 0;
+	int i;
+
+	contracted = malloc(m * sizeof(char));
+	for (i = 0; i < m; ++i) contracted[i] = 0;
+
+	explored = malloc(n * sizeof(char));
+
+	// Find solution
+	recursiveSolve(0, 0, 0);
+
+	// Print solution
+	printSolution();
+
+	// Free allocated memory
+	free(contracted);
+	//free(explored);
+	free(edges);
+	free(items);
+	free(best);
+
+	return EXIT_SUCCESS;
+}
+
+void recursiveSolve(int k, int st, int mot) {
+	// Check whether our current weight is too great,
+	// or if we have created a loop
+	if (max(st,mot) >= best->B || hasLoop(k)) {
+		return;
+	}
+
+	// Check if new best is found
+	if (c_count >= n-1) {
+		best->B = max(st,mot);
+		memcpy(best->edges, contracted, m*sizeof(char));
+		return;
+	}
+
+	// Check if it is still connected
+	if (!isConnected(k)) {
+		return;
+	}
+
+	contracted[k] = 1;
+	c_count++;
+	recursiveSolve(k+1, st+edges[k].w, mot+edges[m-k-1].w);
+
+	c_count--;
+	contracted[k] = 0;
+	recursiveSolve(k+1, st, mot);
+}
+
+/**
+ * Helper functions
+ */
+
+int hasLoop(int k) {
+	if (c_count < 1) return 0;
+
+	// Reset explored set
+	int i;
+	for (i = 0; i < m; ++i) explored[i] = 0;
+
+	// Check if there is a cycle in the contracted set
+	return cycleDFS(k, -1, edges[k-1].n1);
+}
+
+int cycleDFS(int k, int from, int node) {
+	explored[node] = 1;
+
+	Item * item = nbs[node];
+	while (item != NULL) {
+		int other = getOther(node, item->e);
+		if (other == from || contracted[item->e->id] == 0) {
+			item = item->next;
+			continue;
+		}
+
+		if (explored[other] == 1 || cycleDFS(k, node, other)) {
+			return 1;
+		}
+		item = item->next;
+	}
+
+	return 0;
+}
+
+int isConnected(int k) {
+	// Reset explored set
+	int i;
+	for (i = 0; i < m; ++i) explored[i] = 0;
+
+	explored_count = 0;
+	// Check if there is a cycle in the contracted set
+	connectedDFS(k, 0);
+	return explored_count == n;
+}
+
+void connectedDFS(int k, int node) {
+	explored[node] = 1;
+	explored_count++;
+
+	Item * item = nbs[node];
+	while (item != NULL) {
+		int other = getOther(node, item->e);
+		if (explored[other] == 1) {
+			item = item->next;
+			continue;
+		}
+
+		if (item->e->id < k && contracted[item->e->id] == 0) {
+			item = item->next;
+			continue;
+		}
+
+		connectedDFS(k, other);
+		item = item->next;
+	}
+}
+
+int getOther(int node, Edge * e) {
+	if (e == NULL) return -1;
+	if (e->n1 == node) return e->n2;
+	if (e->n2 == node) return e->n1;
+	return -1;
+}
+
+/**
+ * Initialization functions
+ */
+
+int readGraph(char * filename){
+	FILE * fp;
+	fp = fopen(filename, "r");
+	if (fp == NULL)	{
+		return 0;
+	}
+
+	fscanf(fp, "%d", &n);
+	fscanf(fp, "%d", &m);
+
+	edges = malloc(m * sizeof(Edge));
+	nbs = malloc(n * 4);
+
+	int n1, n2, w;
+	items = malloc(2*m * sizeof(Item));
+	int i = 0;
+	while (fscanf(fp, "%d %d %d", &n1, &n2, &w) == 3) {
+		edges[i].id = i;
+		edges[i].n1 = n1-1;
+		edges[i].n2 = n2-1;
+		edges[i].w = w;
+
+		items[i].e = &edges[i];
+		items[i].next = nbs[n1-1];
+		nbs[n1-1] = &items[i];
+
+		items[i+m].e = &edges[i];
+		items[i+m].next = nbs[n2-1];
+		nbs[n2-1] = &items[i+m];
+
+		i++;
+	}
+
+	fclose(fp);
+
+	return 1;
+}
+
+char* getFilename(int argc, char ** argv) {
+	char in[30];
+
+	if (argc > 1) {
+		strcpy(in, argv[1]);
+	} else {
+		printf("Enter filename: ");
+		fflush(stdout);
+		scanf("%s", in);
+	}
+
+	char * filename = malloc(120 * sizeof(char));
+	strcpy(filename, "testfiles/");
+	strcat(filename, in);
+	strcat(filename, ".uwg");
+	return filename;
+}
+
+/**
+ * Sorting
+ */
+
+void quickSort(int *arr, int elements) {
+
+}
+
+/**
+ * Debugging functions
+ */
+
+void printGraph() {
+	printf("n: %d\n", n);
+	printf("m: %d\n", m);
+
+	int i;
+	for (i = 0; i < m; ++i) {
+		printEdge(&edges[i]);
+	}
+
+	Item * item;
+	for (i = 0; i < n; ++i) {
+		item = nbs[i];
+		printf("%d: ", i+1);
+
+		while (item != NULL && item->next != NULL) {
+			printf("%d, ", getOther(i, item->e)+1);
+			item = item->next;
+		}
+		printf("%d\n", getOther(i, item->e)+1);
+	}
+}
+
+void printEdge(Edge * e) {
+	printf("e%d = (%d,%d), w = %d\n",
+			e->id+1,
+			e->n1+1,
+			e->n2+1,
+			e->w);
+}
+
+void printSolution() {
+	printf("%d\n", best->B);
+	int i;
+	for (i = 0; i < m; ++i) {
+		if (best->edges[i]) printf("%d ", i+1);
+	}
+	printf("\n");
+	fflush(stdout);
+}
