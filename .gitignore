@@ -2,8 +2,7 @@
 ## Custom
 #################
 
-multidriver.jar
-nodedriver.jar
+*.stackdump
 
 #################
 ## LaTeX
