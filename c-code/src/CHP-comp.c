@@ -2,9 +2,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
+#include <pthread.h>
 
 int n, m;
 Edge * edges;
+Edge ** sorted;
 Item * items;
 Item ** nbs;
 Solution * best;
@@ -33,12 +36,38 @@ int main(int argc, char ** argv) {
 	int i;
 
 	contracted = malloc(m * sizeof(char));
-	for (i = 0; i < m; ++i) contracted[i] = 0;
+	sorted = malloc(m * sizeof(Edge*));
+
+	for (i = 0; i < m; ++i) {
+		contracted[i] = 0;
+		sorted[i] = &edges[i];
+	}
 
 	explored = malloc(n * sizeof(char));
 
+//	printGraph();
+
+	clock_t begin, end;
+	double time;
+
+	begin = clock();
+	QuickSort(sorted, 0, m-1);
+	for (i = 0; i < m; ++i) {
+		sorted[i]->pos = i;
+	}
+	end = clock();
+	time = (double)(end-begin) / CLOCKS_PER_SEC;
+
+	printf("Time spent sorting: %f\n", time);
+	fflush(stdout);
+
+	begin = clock();
 	// Find solution
 	recursiveSolve(0, 0, 0);
+
+	end = clock();
+	time = (double)(end-begin) / CLOCKS_PER_SEC;
+	printf("Time spent solving: %f\n", time);
 
 	// Print solution
 	printSolution();
@@ -72,12 +101,12 @@ void recursiveSolve(int k, int st, int mot) {
 		return;
 	}
 
-	contracted[k] = 1;
+	contracted[sorted[k]->id] = 1;
 	c_count++;
-	recursiveSolve(k+1, st+edges[k].w, mot+edges[m-k-1].w);
+	recursiveSolve(k+1, st+sorted[k]->w, mot+edges[m-1-sorted[k]->id].w);
 
+	contracted[sorted[k]->id] = 0;
 	c_count--;
-	contracted[k] = 0;
 	recursiveSolve(k+1, st, mot);
 }
 
@@ -93,10 +122,10 @@ int hasLoop(int k) {
 	for (i = 0; i < m; ++i) explored[i] = 0;
 
 	// Check if there is a cycle in the contracted set
-	return cycleDFS(k, -1, edges[k-1].n1);
+	return cycleDFS(-1, sorted[k-1]->n1);
 }
 
-int cycleDFS(int k, int from, int node) {
+int cycleDFS(int from, int node) {
 	explored[node] = 1;
 
 	Item * item = nbs[node];
@@ -107,7 +136,7 @@ int cycleDFS(int k, int from, int node) {
 			continue;
 		}
 
-		if (explored[other] == 1 || cycleDFS(k, node, other)) {
+		if (explored[other] == 1 || cycleDFS(node, other)) {
 			return 1;
 		}
 		item = item->next;
@@ -139,7 +168,7 @@ void connectedDFS(int k, int node) {
 			continue;
 		}
 
-		if (item->e->id < k && contracted[item->e->id] == 0) {
+		if (item->e->pos < k && contracted[item->e->id] == 0) {
 			item = item->next;
 			continue;
 		}
@@ -171,16 +200,22 @@ int readGraph(char * filename){
 	fscanf(fp, "%d", &m);
 
 	edges = malloc(m * sizeof(Edge));
-	nbs = malloc(n * 4);
+	nbs = malloc(n * sizeof(Item*));
 
 	int n1, n2, w;
 	items = malloc(2*m * sizeof(Item));
 	int i = 0;
+	int h;
 	while (fscanf(fp, "%d %d %d", &n1, &n2, &w) == 3) {
 		edges[i].id = i;
 		edges[i].n1 = n1-1;
 		edges[i].n2 = n2-1;
 		edges[i].w = w;
+		if (i >= m/2) {
+			h = EDGE_HEURISTIC(edges, i, m-i-1);
+			edges[i].h1 = h;
+			edges[m-i-1].h1 = h;
+		}
 
 		items[i].e = &edges[i];
 		items[i].next = nbs[n1-1];
@@ -220,12 +255,47 @@ char* getFilename(int argc, char ** argv) {
  * Sorting
  */
 
-void quickSort(int *arr, int elements) {
+void QuickSort(QS_TYPE * list, int beg, int end) {
+	QS_TYPE piv; QS_TYPE tmp;
+	int l, r, p;
 
+	while (beg < end) {
+		l = beg;
+		p = beg + (end-beg)/2;
+		r = end;
+		piv = list[p];
+
+		while (1) {
+			while ((l<=r) && (QS_COMPARE(list[l], piv) <= 0)) l++;
+			while ((l<=r) && (QS_COMPARE(list[r], piv) > 0)) r--;
+			if (l>r) break;
+
+			tmp = list[l];
+			list[l] = list[r];
+			list[r] = tmp;
+
+			if (p == r) p = l;
+			l++;
+			r--;
+		}
+
+		list[p] = list[r];
+		list[r] = piv;
+		r--;
+
+		// Recursion on the shorter side & loop (with new indexes) on the longer
+		if ((r-beg) < (end-l)) {
+			QuickSort(list, beg, r);
+			beg = l;
+		} else {
+			QuickSort(list, l, end);
+			end = r;
+		}
+	}
 }
 
 /**
- * Debugging functions
+ * Useful printing functions
  */
 
 void printGraph() {
