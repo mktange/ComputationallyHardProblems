@@ -1,0 +1,57 @@
+
+\section{Optimization Algorithm Description}
+
+\subsection{General algorithm}
+Our algorithm does an exhaustive search of spanning trees, while storing the tree ($T$) scoring lowest in the equation
+
+$$
+\max \left\{ \sum_{e_i \in T} w(e_i), \sum_{e_i \in T} w(e_{m+1-i}) \right\}
+$$
+
+The spanning trees are found by doing so-called cuts and contracts. This creates a recursive computation as follows
+
+If no edge remain, stop the calculation. Otherwise, pick an edge and:
+
+\begin{enumerate}
+\item Create a copy of the graph, where the end-points of this edge is merged into one point and any edges between them are removed. Store which edge was contracted. In practise we do this by maintaining a set of edges which should be considered contracted for the current calculations.
+
+\item Create a copy of the graph where the edge is removed, if this disconnects a portion of the graph, stop calculating otherwise calculate all spanning trees on the copy.
+\end{enumerate} 
+
+Every leaf of this computation contains a unique spanning tree. It can be found by collecting all stored edges from leaf to root.
+
+\subsection{Tricks}
+Since all edges have positive weights, we can maintain the current ``value'' of the calculation that has been created, i.e. the edges that have already been picked. If we maintain a best found solution, we can stop finding more trees once we reach this value, thereby hopefully cutting of branches from the computation tree.
+
+To increase the number of branches we can cut off, we can try to guess a good edge to contract at every step, using one of two heuristics
+
+\begin{enumerate}
+\item The edge $e_i$ with the lowest score of $\max\left\{w(e_i),w(e_{m+1-i})\right\}$.
+
+\item The edge $e_i$ with the lowest score of $w(e_i)+w(e_{m+1-i})$
+\end{enumerate}
+
+
+\section{Running time}
+If the input graph has $n$ nodes and $m$ edges, we have the following running times.
+
+\begin{itemize}
+\item We can calculate all the heuristic values for edges in $O(m)$
+
+\item We can sort the edges by their heuristic value in $O(m)$.
+
+\item For every inner node in the computation tree we do the following:
+\begin{itemize}
+\item Perform a depth-first-search to see if an edge added to the contracted set, creates a loop. This can be done in $O(n+m)$.
+
+\item Perform a depth-first-search to see if removing an edge splits the current graph in two components. This can be done in $O(m+n)$.
+\end{itemize}
+
+\item The computation tree is binary, and every leaf in the tree corresponds to a spanning tree. Cayleys formula states that a complete graph has $O(n^{n-2})$ spanning trees.
+
+\item The path from a leaf to the root of the tree is at most $m$.
+
+\item The computational tree has in the worst case, at most $O(m\cdot n^{n-2})$ nodes.
+\end{itemize}
+
+Summing this up, we get a running time of $O((m+n)\cdot m\cdot n^{n-2})$, as we perform two depth-first-searches for every inner node in the computation tree.
