@@ -1,8 +1,9 @@
-\documentclass[11pt,a4paper]{report}
+\documentclass[11pt,a4paper]{article}
 \newcommand{\confdir}{conf/} % Set the folder which contains preamble.tex, titlepage.tex and the general img/ folder
 \newcommand{\imgdir}{img/} % Set the folder which contains the specific images for the report
 \newcommand{\texdir}{tex/} % Set the folder which contains the content (.tex files)
 \newcommand{\srcdir}{../code/src/} % Set the folder which contains the content (.tex files)
+\usepackage{fixltx2e}
 \input{\confdir preamble}
 
 
@@ -45,6 +46,7 @@
 \inserttoc
 
 %% Input files for the report
+\import{\texdir}{AandB}
 \import{\texdir}{NPComplete}
 \import{\texdir}{algorithm}
 %\import{\texdir}{design}
