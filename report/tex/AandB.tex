@@ -1,0 +1,54 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{fixltx2e}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\author{Casper Tollund - s093037}
+\begin{document}
+\section{A}
+
+The problem resembles the Minimum Spanning Tree problem, with the addition of having to calculate the complete weight of the inverse edges to the edges used in the spanning tree, and finding the largest of those two values. This value has to be smaller than some given number B. \\
+	
+	The given problem is a graph with 3 nodes and three edges, so all nodes are connected to each other. The problem will return true, since the spanning tree with edges e\textsubscript{1} and e\textsubscript{3} have a complete weight of 4, and the reverse edges, which are also e\textsubscript{3} and e\textsubscript{1} will have a complete weight of 4 also. If any other spanning tree is chosen, either the spanning trees complete weight or the complete weight of the inverse edges will be 5 or more. 	\\
+
+\section{B}
+
+\subsection{Algorithm}
+\begin{itemize}
+\item Let the string R consist of edges in G: R = r\textsubscript{1},r\textsubscript{2},...,r\textsubscript{l}.
+\item If the number of edges in R does not equal n-1, where n is the number of vertices in the input graph G, then return NO.
+\item Check whether the edges in R form a spanning tree in G. If not, then return NO.
+\item Let the string Q consist of the inverse edges of the edges in R, such that if r\textsubscript{1}=e\textsubscript{k}, then q\textsubscript{1}=e\textsubscript{m+1-k}: Q = q\textsubscript{1},q\textsubscript{2},...,q\textsubscript{l}. 
+\item Calculate the complete weight of the spanning tree formed by the edges in R.
+\item Calculate the complete weight of all the edges in Q.
+\item If the complete weight of all the edges in R is smaller than B, and the complete weight of all the edges in Q is smaller than B, then return YES. Else return NO.\\
+\end{itemize}
+\subsection{Conditions}
+Assume answer is YES
+\begin{itemize}
+\item Then there exists a spanning tree made up of edges in G, with the complete weight of the spanning tree being less than B, and the complete weight of the inverse edges to the edges in the spanning tree also being less than B.
+\item Construct a string of edges R* = r\textsubscript{1},r\textsubscript{2},...,r\textsubscript{l} containing all the edges in the spanning tree
+\item When the algorithm receives R*, it will construct the spanning tree, calculate the weight of it, and calculate the weight of the inverse edges and return YES.
+\item Therefore there is a string of length n-1 that will return YES. The probability of creating it is positive.\\\\
+\end{itemize}
+Assume the answer is NO
+\begin{itemize}
+\item Then no set of edges can create a spanning tree where both the complete weight of the spanning and the complete weight of the inverse edges of the edges in the spanning tree will be less than B.
+\item If the length of R is not n-1 then it will return NO.
+\item If the length of R is n-1, then the algorithm will check to see whether the edges in R form a spanning tree. If not then it will return NO.
+\item If they do form a spanning tree, then it will calculate the complete weight of the spanning tree and the complete weight of the inverse edges.
+\item These values are compared to B
+\item Since both weights cannot be less than B, it will return NO.\\
+\end{itemize}
+\subsection{Running time}
+\begin{itemize}
+\item It is checked whether there are n-1 edges in R. Time: O(n).
+\item It is checked whether the edges in R form a spanning tree in G. Time: O(n).
+\item Q is created from the inverse edges of the edges in R. Time: O(n).
+\item The complete weight of R is calculated: Time O(n).
+\item The complete weight of Q is calculated: Time O(n).
+\item The complete running time is therefore O(n).
+\end{itemize}
+\end{document}
