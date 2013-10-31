@@ -29,7 +29,6 @@ Given an instance $X$ of PBP, we do the following transformation ($T(X)$). We ca
 
 We order the set of edges, so the mirror of the edge with weight $s_{2i-1}$ is $s_{2i}$ and the mirror of an edge with weight 0 is an edge with weight 0 (if there is an odd number of pairs, the middle edge will be a zero that mirrors into itself). For multiple pairs, we chain multiple graphs together as shown in Fig.~\ref{fig:transform2}. 
 \begin{figure}[htb]
-\resizebox{\linewidth}{!}{
 \centering
 \begin{tikzpicture}[auto,node distance=1.5cm,
   thick,main node/.style={circle,draw,font=\sffamily\small\bfseries}]
@@ -60,7 +59,7 @@ We order the set of edges, so the mirror of the edge with weight $s_{2i-1}$ is $
         ;
              
    \draw[style=dashed, ] (5) -- (6);
-\end{tikzpicture}}
+\end{tikzpicture}
 \caption{Transformation of several pairs}
 \label{fig:transform2}
 \end{figure}
