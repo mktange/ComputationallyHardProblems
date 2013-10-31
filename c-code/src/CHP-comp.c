@@ -1,16 +1,19 @@
+#define DEBUG
+
 #include "CHP-comp.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <pthread.h>
 
 int n, m;
 Edge * edges;
 Edge ** sorted;
 Item * items;
 Item ** nbs;
-Solution * best;
+
+int bestB;
+char * bestEdges;
 
 char *contracted;
 int c_count;
@@ -29,12 +32,12 @@ int main(int argc, char ** argv) {
 	free(filename);
 
 	// Initialize variables and arrays
-	best = malloc(sizeof(Solution));
-	best->B = 2147483647;
-	best->edges = malloc(m*sizeof(char));
+	bestB = 2147483647;
+	bestEdges = malloc(m*sizeof(char));
 	c_count = 0;
 	int i;
 
+	explored = malloc(n * sizeof(char));
 	contracted = malloc(m * sizeof(char));
 	sorted = malloc(m * sizeof(Edge*));
 
@@ -43,31 +46,20 @@ int main(int argc, char ** argv) {
 		sorted[i] = &edges[i];
 	}
 
-	explored = malloc(n * sizeof(char));
-
-//	printGraph();
-
-	clock_t begin, end;
-	double time;
-
-	begin = clock();
 	QuickSort(sorted, 0, m-1);
-	for (i = 0; i < m; ++i) {
-		sorted[i]->pos = i;
-	}
-	end = clock();
-	time = (double)(end-begin) / CLOCKS_PER_SEC;
+	for (i = 0; i < m; ++i) sorted[i]->pos = i;
 
-	printf("Time spent sorting: %f\n", time);
-	fflush(stdout);
-
-	begin = clock();
 	// Find solution
+#ifdef DEBUG
+	clock_t start, end;
+	start = clock();
+#endif
 	recursiveSolve(0, 0, 0);
-
+#ifdef DEBUG
 	end = clock();
-	time = (double)(end-begin) / CLOCKS_PER_SEC;
-	printf("Time spent solving: %f\n", time);
+	printf(	"Time to find solution: %f\n",
+			(double)(end-start) / CLOCKS_PER_SEC);
+#endif
 
 	// Print solution
 	printSolution();
@@ -77,7 +69,7 @@ int main(int argc, char ** argv) {
 	//free(explored);
 	free(edges);
 	free(items);
-	free(best);
+	free(bestEdges);
 
 	return EXIT_SUCCESS;
 }
@@ -85,14 +77,14 @@ int main(int argc, char ** argv) {
 void recursiveSolve(int k, int st, int mot) {
 	// Check whether our current weight is too great,
 	// or if we have created a loop
-	if (max(st,mot) >= best->B || hasLoop(k)) {
+	if (max(st,mot) >= bestB || hasLoop(k)) {
 		return;
 	}
 
 	// Check if new best is found
 	if (c_count >= n-1) {
-		best->B = max(st,mot);
-		memcpy(best->edges, contracted, m*sizeof(char));
+		bestB = max(st,mot);
+		memcpy(bestEdges, contracted, m*sizeof(char));
 		return;
 	}
 
@@ -329,10 +321,10 @@ void printEdge(Edge * e) {
 }
 
 void printSolution() {
-	printf("%d\n", best->B);
+	printf("%d\n", bestB);
 	int i;
 	for (i = 0; i < m; ++i) {
-		if (best->edges[i]) printf("%d ", i+1);
+		if (bestEdges[i]) printf("%d ", i+1);
 	}
 	printf("\n");
 	fflush(stdout);
