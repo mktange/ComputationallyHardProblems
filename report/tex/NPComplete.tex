@@ -1,11 +1,3 @@
-\documentclass[11pt,a4paper]{article}
-\usepackage[utf8]{inputenc}
-\usepackage{amsmath}
-\usepackage{amsfonts}
-\usepackage{amssymb}
-\usepackage{tikz}
-\author{Mikkel Riber Bojsen - s093255}
-\begin{document}
 \section{$\mathcal{NP}$-completeness}
 
 To prove $\mathcal{NP}$-completeness, we look at the problem \textsc{PartitionByPairs} (PBP). 
@@ -132,6 +124,3 @@ If we pick more than one edge from a pair, we increase both the weight of the sp
 In summary, this means that if the original answer is NO, we cannot pick a spanning tree using one from each pair, where the maximum value of the tree and the mirror is exactly $B$. As we need to pick at least one from each pair to have a spanning tree, and picking more than one, always increases both values, we cannot get a spanning tree that will make MFMST answer NO.
 
 As our transformation runs in polynomial time, the original problem is $\mathcal{NP}-complete$, our transformation preserves the original answer and MFMST is in $\mathcal{NP}$, we can conclude that MFMST is $\mathcal{NP}-complete$.
-
-\input{algorithm}
-\end{document}
