@@ -1,4 +1,5 @@
-#define DEBUG
+#define TIME
+#define MATRIX
 
 #include "CHP-comp.h"
 #include <stdio.h>
@@ -9,17 +10,23 @@
 int n, m;
 Edge * edges;
 Edge ** sorted;
+
 Item * items;
 Item ** nbs;
 
-int bestB;
+#ifdef MATRIX
+Edge *** edgeMatrix;
+#else
+int explored_count;
+#endif
+
 char * bestEdges;
+int bestB;
 
 char *contracted;
 int c_count;
 
 char *explored;
-int explored_count;
 
 int main(int argc, char ** argv) {
 	char * filename = getFilename(argc, argv);
@@ -32,52 +39,57 @@ int main(int argc, char ** argv) {
 	free(filename);
 
 	// Initialize variables and arrays
-	bestB = 2147483647;
-	bestEdges = malloc(m*sizeof(char));
-	c_count = 0;
 	int i;
+	c_count = 0;
+	bestB = 2147483647; // integer max value
 
-	explored = malloc(n * sizeof(char));
+	bestEdges = malloc(m * sizeof(char));
 	contracted = malloc(m * sizeof(char));
 	sorted = malloc(m * sizeof(Edge*));
+	explored = malloc(n * sizeof(char));
 
 	for (i = 0; i < m; ++i) {
 		contracted[i] = 0;
 		sorted[i] = &edges[i];
 	}
 
+	// Sort edges based on a predefined heuristic
 	QuickSort(sorted, 0, m-1);
-	for (i = 0; i < m; ++i) sorted[i]->pos = i;
+	for (i = 0;i < m; ++i) sorted[i]->pos = i;
 
 	// Find solution
-#ifdef DEBUG
+#ifdef TIME
 	clock_t start, end;
 	start = clock();
 #endif
 	recursiveSolve(0, 0, 0);
-#ifdef DEBUG
+#ifdef TIME
 	end = clock();
-	printf(	"Time to find solution: %f\n",
-			(double)(end-start) / CLOCKS_PER_SEC);
+	printf(	"Time to find solution: %.3f\n", (double)(end-start) / CLOCKS_PER_SEC);
+	fflush(stdout);
 #endif
 
 	// Print solution
 	printSolution();
 
 	// Free allocated memory
-	free(contracted);
-	//free(explored);
+	//	free(contracted);
+	//	free(explored);
 	free(edges);
 	free(items);
 	free(bestEdges);
+#ifdef MATRIX
+	for (i = 0; i < n; ++i) free(edgeMatrix[i]);
+	free(edgeMatrix);
+#endif
 
 	return EXIT_SUCCESS;
 }
 
 void recursiveSolve(int k, int st, int mot) {
 	// Check whether our current weight is too great,
-	// or if we have created a loop
-	if (max(st,mot) >= bestB || hasLoop(k)) {
+	// or if we have created a cycle
+	if (max(st,mot) >= bestB || hasCycle(k)) {
 		return;
 	}
 
@@ -106,7 +118,7 @@ void recursiveSolve(int k, int st, int mot) {
  * Helper functions
  */
 
-int hasLoop(int k) {
+int hasCycle(int k) {
 	if (c_count < 1) return 0;
 
 	// Reset explored set
@@ -138,16 +150,51 @@ int cycleDFS(int from, int node) {
 }
 
 int isConnected(int k) {
+	if (k < 1) return 1;
+
 	// Reset explored set
 	int i;
 	for (i = 0; i < m; ++i) explored[i] = 0;
 
-	explored_count = 0;
 	// Check if there is a cycle in the contracted set
+#ifdef MATRIX
+	return connectedDFSmatrix(k, sorted[k-1]->n1, sorted[k-1]->n2);
+#else
+	explored_count = 0;
 	connectedDFS(k, 0);
 	return explored_count == n;
+#endif
 }
 
+#ifdef MATRIX
+int connectedDFSmatrix(int k, int node, int end) {
+	if (edgeMatrix[node][end]) {
+		if (edgeMatrix[node][end]->pos >= k) return 1;
+		if (contracted[edgeMatrix[node][end]->id] == 1) return 1;
+	}
+	explored[node] = 1;
+
+	Item * item = nbs[node];
+	while (item != NULL) {
+		int other = getOther(node, item->e);
+
+		if (explored[other] == 1 ||	other == end) {
+			item = item->next;
+			continue;
+		}
+
+		if (item->e->pos < k && contracted[item->e->id] == 0) {
+			item = item->next;
+			continue;
+		}
+
+		if (connectedDFSmatrix(k, other, end)) return 1;
+		item = item->next;
+	}
+
+	return 0;
+}
+#else
 void connectedDFS(int k, int node) {
 	explored[node] = 1;
 	explored_count++;
@@ -169,6 +216,7 @@ void connectedDFS(int k, int node) {
 		item = item->next;
 	}
 }
+#endif
 
 int getOther(int node, Edge * e) {
 	if (e == NULL) return -1;
@@ -194,10 +242,19 @@ int readGraph(char * filename){
 	edges = malloc(m * sizeof(Edge));
 	nbs = malloc(n * sizeof(Item*));
 
+	int i;
+#ifdef MATRIX
+	edgeMatrix = malloc(n * sizeof(Edge**));
+	for (i = 0; i < n; ++i)	{
+		edgeMatrix[i] = malloc(n * sizeof(Edge*));
+		memset(edgeMatrix[i], 0, n*sizeof(Edge*));
+	}
+#endif
+
 	int n1, n2, w;
 	items = malloc(2*m * sizeof(Item));
-	int i = 0;
 	int h;
+	i = 0;
 	while (fscanf(fp, "%d %d %d", &n1, &n2, &w) == 3) {
 		edges[i].id = i;
 		edges[i].n1 = n1-1;
@@ -208,6 +265,11 @@ int readGraph(char * filename){
 			edges[i].h1 = h;
 			edges[m-i-1].h1 = h;
 		}
+
+#ifdef MATRIX
+		edgeMatrix[n1-1][n2-1] = &edges[i];
+		edgeMatrix[n2-1][n1-1] = &edges[i];
+#endif
 
 		items[i].e = &edges[i];
 		items[i].next = nbs[n1-1];
@@ -221,12 +283,11 @@ int readGraph(char * filename){
 	}
 
 	fclose(fp);
-
 	return 1;
 }
 
 char* getFilename(int argc, char ** argv) {
-	char in[30];
+	char in[40];
 
 	if (argc > 1) {
 		strcpy(in, argv[1]);
