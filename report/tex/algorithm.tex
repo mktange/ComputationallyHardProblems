@@ -47,20 +47,20 @@ An example of such a computation tree can be seen in \Cref{fig:comptree}, where 
   thick,main node/.style={circle,draw,font=\sffamily\tiny},
   edge label/.style={midway,above,sloped,font=\sffamily\tiny}]
 
-  \node[main node] (1) {1};
+  \node[main node] (1) {};
   \node[node distance=1.05cm] (1a) [left of=1] {};
   \node[node distance=1.05cm] (1b) [right of=1] {};
-  \node[main node] (2) [below left of=1a] {2};
-  \node[main node] (3) [below right of=1b] {3};
+  \node[main node] (2) [below left of=1a] {};
+  \node[main node] (3) [below right of=1b] {};
   
-  \node[main node,blue] (4) [below left of=2] {4};
-  \node[main node] (5) [below right of=2] {5};
-  \node[main node] (6) [below left of=3] {6};
-  \node[main node,opacity=0.4] (7) [below right of=3] {7};
+  \node[main node,blue] (4) [below left of=2] {};
+  \node[main node] (5) [below right of=2] {};
+  \node[main node] (6) [below left of=3] {};
+  \node[main node,opacity=0.4] (7) [below right of=3] {};
   
-  \node[main node,opacity=0.4] (8) [below left=0.8cm and 0.5cm of 4] {8};
-  \node[main node,opacity=0.4] (9) [below right=0.8cm and 0.5cm of 4] {9};
-  \node[main node,blue] (10) [below left=0.8cm and 0.5cm of 5] {10};
+  \node[main node,opacity=0.4] (8) [below left=0.8cm and 0.5cm of 4] {};
+  \node[main node,opacity=0.4] (9) [below right=0.8cm and 0.5cm of 4] {};
+  \node[main node,blue] (10) [below left=0.8cm and 0.5cm of 5] {};
   \node[main node,opacity=0.4] (11) [below right=0.8cm and 0.5cm of 5] {};
   \node[main node,blue] (12) [below left=0.8cm and 0.5cm of 6] {};
   \node[main node,opacity=0.4] (13) [below right=0.8cm and 0.5cm of 6] {};
