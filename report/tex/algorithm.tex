@@ -34,9 +34,71 @@ If no edge remain, stop the calculation. Otherwise, pick an edge and:
 \end{itemize}
 \end{enumerate} 
 
-\todo{Tegn et computation tree}
+Every leaf of this computation tree contains a unique spanning tree. It can be found by collecting all stored edges from leaf to root.\bigskip
 
-Every leaf of this computation contains a unique spanning tree. It can be found by collecting all stored edges from leaf to root.
+An example of such a computation tree can be seen in \Cref{fig:comptree}, where all possible cuts and contracts that can be made are shown for the example graph from \Cref{fig:example}. The lines/nodes are grayed out when a cycle has been created (during a \texttt{contract}), or the graph has been split into multiple connected components (during a \texttt{cut}). Finally one can see that three spanning trees are found, each one marked with a blue leaf node.
+
+\begin{figure}[H]
+\resizebox{\linewidth}{!}{
+\centering
+\begin{tikzpicture}[auto,node distance=1.5cm,font=\sffamily\tiny,
+  thick,main node/.style={circle,draw,font=\sffamily\footnotesize},
+  edge label/.style={midway,above,sloped,font=\sffamily\tiny}]
+
+  \node[main node] (1) {};
+  \node[node distance=1.05cm] (1a) [left of=1] {};
+  \node[node distance=1.05cm] (1b) [right of=1] {};
+  \node[main node] (2) [below left of=1a] {};
+  \node[main node] (3) [below right of=1b] {};
+  
+  \node[main node,blue] (4) [below left of=2] {};
+  \node[main node] (5) [below right of=2] {};
+  \node[main node] (6) [below left of=3] {};
+  \node[main node,opacity=0.4] (7) [below right of=3] {};
+  
+  \node[main node,opacity=0.4] (8) [below left=0.8cm and 0.5cm of 4] {};
+  \node[main node,opacity=0.4] (9) [below right=0.8cm and 0.5cm of 4] {};
+  \node[main node,blue] (10) [below left=0.8cm and 0.5cm of 5] {};
+  \node[main node,opacity=0.4] (11) [below right=0.8cm and 0.5cm of 5] {};
+  \node[main node,blue] (12) [below left=0.8cm and 0.5cm of 6] {};
+  \node[main node,opacity=0.4] (13) [below right=0.8cm and 0.5cm of 6] {};
+  \node[main node,opacity=0.4] (14) [below left=0.8cm and 0.5cm of 7] {};
+  \node[main node,opacity=0.4] (15) [below right=0.8cm and 0.5cm of 7] {};
+  
+  \draw (1) -- (2) node[edge label] {contract};
+  \draw (1) -- (3) node[edge label] {cut};
+  
+  \draw (2) -- (4) node[edge label] {contract};
+  \draw (2) -- (5) node[edge label] {cut};
+  \draw (3) -- (6) node[edge label] {contract};
+  \draw[dashed,opacity=0.4] (3) -- (7) node[edge label] {cut};
+  
+  \draw[dashed,opacity=0.4] (4) -- (8) node[edge label]{contract};
+  \draw[dashed,opacity=0.4] (4) -- (9) node[edge label] {cut};
+  \draw (5) -- (10) node[edge label] {contract};
+  \draw[dashed,opacity=0.4] (5) -- (11) node[edge label] {cut};
+  \draw (6) -- (12) node[edge label] {contract};
+  \draw[dashed,opacity=0.4] (6) -- (13) node[edge label] {cut};
+  \draw[dashed,opacity=0.4] (7) -- (14) node[edge label] {contract};
+  \draw[dashed,opacity=0.4] (7) -- (15) node[edge label] {cut};
+ 
+ 
+  \node[font=\small] (L1) [below right=0.1cm and 4.5cm of 1] {$e_1$};
+  \node[font=\small] (L2) [below=0.55cm of L1] {$e_2$};
+  \node[font=\small] (L3) [below=0.55cm of L2] {$e_3$};
+
+  \node[] (La1) [left=9cm of L1] {};
+  \node[] (La2) [left=9cm of L2] {};
+  \node[] (La3) [left=9cm of L3] {};
+  
+  \draw[dashed, thin, opacity=0.1] (L1) -- (La1);
+  \draw[dashed, thin, opacity=0.1] (L2) -- (La2);
+  \draw[dashed, thin, opacity=0.1] (L3) -- (La3);
+\end{tikzpicture}}
+\caption{Computation tree for the graph \Cref{fig:example} in order to find all the spanning trees (marked as a blue nodes).}
+\label{fig:comptree}
+\end{figure}
+
 
 \subsection{Tricks}
 Since all edges have positive weights, we can maintain the current ``value'' of the calculation that has been created, i.e. the edges that have already been picked. If we maintain a best found solution, we can stop finding more trees once we reach this value, thereby hopefully cutting of branches from the computation tree.
