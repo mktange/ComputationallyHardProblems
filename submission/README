@@ -2,7 +2,7 @@
 
 Can be compiled with the gcc-compiler with the following command:
 
-    gcc -O3 CHP-comp.c
+    gcc -O3 CHP.c -o CHP
 
 
 == Running the program ==
