@@ -36,6 +36,8 @@ If no edge remain, stop the calculation. Otherwise, pick an edge and:
 
 Every leaf of this computation tree contains a unique spanning tree. It can be found by collecting all stored edges from leaf to root.\bigskip
 
+\subsection{Computation tree}
+
 An example of such a computation tree can be seen in \Cref{fig:comptree}, where all possible cuts and contracts that can be made are shown for the example graph from \Cref{fig:example}. The lines/nodes are grayed out when a cycle has been created (during a \texttt{contract}), or the graph has been split into multiple connected components (during a \texttt{cut}). Finally one can see that three spanning trees are found, each one marked with a blue leaf node.
 
 \begin{figure}[H]
@@ -95,7 +97,7 @@ An example of such a computation tree can be seen in \Cref{fig:comptree}, where 
   \draw[dashed, thin, opacity=0.1] (L2) -- (La2);
   \draw[dashed, thin, opacity=0.1] (L3) -- (La3);
 \end{tikzpicture}}
-\caption{Computation tree for the graph \Cref{fig:example} in order to find all the spanning trees (marked as a blue nodes).}
+\caption{Computation tree for the graph \Cref{fig:example} in order to find all the valid spanning trees. These have been marked with a blue nodes.}
 \label{fig:comptree}
 \end{figure}
 
@@ -106,7 +108,7 @@ Since all edges have positive weights, we can maintain the current ``value'' of 
 To increase the number of branches we can cut off, we can try to guess a good edge to contract at every step, using one of two heuristics:
 
 \begin{enumerate}
-\item The edge $e_i$ with the lowest score of $\max\left\{w(e_i),w(e_{m+1-i})\right\}$ (maximum of edge/mirror)
+\item The edge $e_i$ with the lowest score of $\max\left\{w(e_i),w(e_{m+1-i})\right\}$  (maximum of edge/mirror)
 
 \item The edge $e_i$ with the lowest score of $w(e_i)+w(e_{m+1-i})$ (sum of edge/mirror)
 \end{enumerate}
@@ -126,7 +128,7 @@ Assume a spanning tree $T'$ exists which we did not check.
 \begin{itemize}
 \item If we did not find this tree, there is no leaf in our computation tree that corresponds to $T'$.
 
-\item If $T'$ contains $e_1$, then we can move down the left edge of the root of the computation tree (pick it for tree). If $e_1$ is not in $T'$ we take the right edge from the root (cut it from graph).
+\item If $T'$ contains $e_1$, then we can move down the left edge of the root of the computation tree (contract). If $e_1$ is not in $T'$ we take the right edge from the root (cut).
 
 \item This can be done for all edges, except those that would disconnect the graph if removed, or if using the edge creates a cycle in our current tree.
 
