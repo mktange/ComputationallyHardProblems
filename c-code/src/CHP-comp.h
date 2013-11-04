@@ -3,7 +3,10 @@
        __typeof__ (b) _b = (b); \
      _a > _b ? _a : _b; })
 
-#define avg(a,b) abs((a-b)/2)
+#define min(a,b) \
+   ({ __typeof__ (a) _a = (a); \
+       __typeof__ (b) _b = (b); \
+     _a > _b ? _b : _a; })
 
 #define QS_TYPE Edge*
 #define QS_COMPARE(a,b) (a->h1 - b->h1)
@@ -11,6 +14,8 @@
 #if E == 1
 #define EDGE_HEURISTIC(edges, i, mi) (edges[i].w + edges[mi].w)
 #elif E == 2
+#define EDGE_HEURISTIC(edges, i, mi) (min(edges[i].w, edges[mi].w))
+#elif E == 3
 #define EDGE_HEURISTIC(edges, i, mi) (i)
 #else
 #define EDGE_HEURISTIC(edges, i, mi) (max(edges[i].w, edges[mi].w))

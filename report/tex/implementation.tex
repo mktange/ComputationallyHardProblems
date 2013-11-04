@@ -1,0 +1,29 @@
+\section{Implementation Specifics}
+
+We have implemented the code in \texttt{C} in order to get some decent running times on bigger problems.
+
+\subsection{Sorting}
+
+To try to optimize the way we build our spanning trees, we have chosen to use some heuristics to order the edges in some way that is hopefully beneficial such that we can find the potential smaller $B$s faster.
+
+Since we did not want to code, test and make sure our own implemented sorting algorithm (i.e. MergeSort) works, we have chosen to use an implementation of QuickSort that we found online\footnote{\url{http://en.wikibooks.org/wiki/Algorithm\_Implementation/Sorting/Quicksort\#C} }. It has been slightly modified to fit our purposes.
+
+
+\subsection{Graph duplication}
+
+Instead of copying the graph every time we do a cut or contract, we just keep some variables to figure out how the graph will look in the next computation step. This is done by:
+
+\begin{itemize}
+\item Keeping an integer of the current position in our sorted edge list, which increases whenever we go down a step in the computation tree.
+
+\item Keeping a bit-vector of length $m$, which has a 1 at position $i$ if edge $e_i$ is contracted, and a 0 otherwise. This vector is changed in every step of the computation. The benefit is that we can reuse this single vector it as cuts and contracts happen, since we are at exactly one spot in the tree at any given time.
+\end{itemize}
+
+
+\subsection{DFS edge matrix optimization}
+
+When we check if we have split the graph into multiple connected components after a cut, one can perform a DFS to see if all nodes are still reachable from a given start node. 
+
+However, to make this faster, we start searching from one of the nodes connected to the cut edge and then just try to find the corresponding other node. This way we will likely skip searching the entire graph. We can also optimize our search a bit by trying to see if the current node we are at in our search, is connected to the end node, since we can then confirm that the cut did not split the graph.
+
+

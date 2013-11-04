@@ -1,4 +1,4 @@
-//#define TIME
+#define TIME
 #define MATRIX
 
 #include "CHP-comp.h"
@@ -27,6 +27,7 @@ char *contracted;
 int c_count;
 
 char *explored;
+char print = 1;
 
 int main(int argc, char ** argv) {
 	char * filename = getFilename(argc, argv);
@@ -97,6 +98,11 @@ void recursiveSolve(int k, int st, int mot) {
 	if (c_count >= n-1) {
 		bestB = max(st,mot);
 		memcpy(bestEdges, contracted, m*sizeof(char));
+		if (print) {
+			printf("First tree found: %d\n", bestB);
+			fflush(stdout);
+			print = 0;
+		}
 		return;
 	}
 
