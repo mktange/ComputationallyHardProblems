@@ -7,10 +7,14 @@
 
 #define QS_TYPE Edge*
 #define QS_COMPARE(a,b) (a->h1 - b->h1)
-//#define EDGE_HEURISTIC(edges, i, mi) (edges[i].w + edges[mi].w)
+
+#if E == 1
+#define EDGE_HEURISTIC(edges, i, mi) (edges[i].w + edges[mi].w)
+#elif E == 2
+#define EDGE_HEURISTIC(edges, i, mi) (i)
+#else
 #define EDGE_HEURISTIC(edges, i, mi) (max(edges[i].w, edges[mi].w))
-//#define EDGE_HEURISTIC(edges, i, mi) (avg(edges[i].w, edges[mi].w))
-//#define EDGE_HEURISTIC(edges, i, mi) (i)
+#endif
 
 #ifndef CHP
 #define CHP

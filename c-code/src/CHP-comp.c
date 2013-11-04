@@ -1,4 +1,4 @@
-#define TIME
+//#define TIME
 #define MATRIX
 
 #include "CHP-comp.h"
@@ -287,7 +287,7 @@ int readGraph(char * filename){
 }
 
 char* getFilename(int argc, char ** argv) {
-	char in[40];
+	char in[200];
 
 	if (argc > 1) {
 		strcpy(in, argv[1]);
@@ -298,9 +298,11 @@ char* getFilename(int argc, char ** argv) {
 	}
 
 	char * filename = malloc(120 * sizeof(char));
-	strcpy(filename, "testfiles/");
-	strcat(filename, in);
-	strcat(filename, ".uwg");
+	strcpy(filename, in);
+
+	//strcpy(filename, "testfiles/");
+	//strcat(filename, in);
+	//strcat(filename, ".uwg");
 	return filename;
 }
 
