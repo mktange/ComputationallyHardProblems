@@ -8,8 +8,10 @@ $$
 \max \left\{ \sum_{e_i \in T} w(e_i), \sum_{e_i \in T} w(e_{m+1-i}) \right\}
 $$
 
-The spanning trees are found by doing so-called cuts and contracts. This creates a recursive computation as follows \todo{Mangler noget her?}
+The spanning trees are found by doing so-called cuts and contracts. In the algorithm, we treat the graph as being a weighed, directed multigraph. This creates a recursive computation as follows:
 
+\vspace{0.5cm}
+\noindent
 If no edge remain, stop the calculation. Otherwise, pick an edge and:
 
 \begin{enumerate}
