@@ -3,7 +3,7 @@
 To prove $\mathcal{NP}$-completeness, we look at the problem \textsc{PartitionByPairs} (PBP). 
 
 \subsection{Transformation}
-Given an instance $X$ of PBP, we do the following transformation ($T(X)$). We calculate the value $B = \frac{\sum_{i=1}^{2n} s_i}{2}$. For each pair $(s_{2i-1}, s_{2i})$ in $S$,  where $i \in \lbrace 1,\dots, n \rbrace $, we construct a graph as show in Fig.~\ref{fig:transform1}, where the labels are the weights of the corresponding edge. 
+Given an instance $X$ of PBP, we do the following transformation $T(X)$. We start off by calculating the value $B = \frac{1}{2}\sum_{i=1}^{2n} s_i$. For each pair $(s_{2i-1}, s_{2i})$ in $S$,  where $i \in \lbrace 1,\dots, n \rbrace $, we construct a graph as show in Fig.~\ref{fig:transform1}, where the labels are the weights of the corresponding edge. 
 
 \begin{figure}[!htb]
 \centering
@@ -27,7 +27,7 @@ Given an instance $X$ of PBP, we do the following transformation ($T(X)$). We ca
 \label{fig:transform1}
 \end{figure}
 
-We order the set of edges, so the mirror of the edge with weight $s_{2i-1}$ is $s_{2i}$ and the mirror of an edge with weight 0 is an edge with weight 0 (if there is an odd number of pairs, the middle edge will be a zero that mirrors into itself). For multiple pairs, we chain multiple graphs together as shown in Fig.~\ref{fig:transform2}. 
+We order the set of edges, so the mirror of the edge with weight $s_{2i-1}$ is $s_{2i}$ and the mirror of an edge with weight 0 is another edge with weight 0. If there is an odd number of pairs, the middle edge will be a zero-edge that mirrors into itself). For multiple pairs, we chain multiple graphs together as shown in Fig.~\ref{fig:transform2}. 
 \begin{figure}[htb]
 \centering
 \begin{tikzpicture}[auto,node distance=1.5cm,
@@ -72,7 +72,7 @@ Using this graph and the calculated value $B$ we can query MFMST to answer PBP.
 
 We do our transformation in polynomial time. The calculation of $B$ is done in $O(n)$. For each pair, we construct a constant number of nodes and edges, so the graph can be created in $O(n)$, this means our transformation can be done in $O(n)$.
 
-If the answer to the original problem instance $X$ is YES, it means that a partition where we pick one from each pair equals $B$. It is possible to pick a spanning tree where we pick one from each pair as shown in Fig~\ref{fig:transform3}. As the answer to the original problem was YES, and we can pick a spanning tree that uses an edge from each pair, the answer must also be YES to $T(X)$.
+If the answer to the original problem instance $X$ is YES, it means that a partition where we pick one from each pair, equals $B$. It is possible to pick a spanning tree where we pick one from each pair as shown in Fig~\ref{fig:transform3}. As the answer to the original problem was YES, and we can pick a spanning tree that uses an edge from each pair, the answer must also be YES to $T(X)$.
 
 \begin{figure}[htb]
 \resizebox{\linewidth}{!}{
