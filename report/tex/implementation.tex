@@ -4,7 +4,7 @@ We have implemented the code in \texttt{C} in order to get some decent running t
 
 \subsection{Sorting}
 
-To try to optimize the way we build our spanning trees, we have chosen to use some heuristics to order the edges in some way that is hopefully beneficial such that we can find the potential smaller $B$s faster.
+To try to optimize the way we build our spanning trees, we have chosen to use some heuristics to order the edges in some way that is hopefully beneficial. By doing this, we hope to find a potentially small $B$ faster.
 
 Since we did not want to code, test and make sure our own implemented sorting algorithm (i.e. MergeSort) works, we have chosen to use an implementation of QuickSort that we found online\footnote{\url{http://en.wikibooks.org/wiki/Algorithm\_Implementation/Sorting/Quicksort\#C} }. It has been slightly modified to fit our purposes.
 
@@ -13,11 +13,11 @@ Since we did not want to code, test and make sure our own implemented sorting al
 
 Instead of copying the graph every time we do a cut or contract, we just keep some variables to figure out how the graph will look in the next computation step. This is done by:
 
-\begin{itemize}
-\item Keeping an integer of the current position in our sorted edge list, which increases whenever we go down a step in the computation tree.
+\begin{description}
+\item[Cuts] Keeping an integer of the current position in our sorted edge list, which increases whenever we go down a step in the computation tree.
 
-\item Keeping a bit-vector of length $m$, which has a 1 at position $i$ if edge $e_i$ is contracted, and a 0 otherwise. This vector is changed in every step of the computation. The benefit is that we can reuse this single vector it as cuts and contracts happen, since we are at exactly one spot in the tree at any given time.
-\end{itemize}
+\item[Contractions] We keep a bit-vector of length $m$, which has a 1 at position $i$ if edge $e_i$ is contracted, and a 0 otherwise. This vector is changed in every step of the computation. The benefit is that we can reuse this single vector it as cuts and contracts happen, since we are at exactly one spot in the tree at any given time. We make sure to reset the value of an edge, when we go back up the computation tree.
+\end{description}
 
 
 \subsection{DFS edge matrix optimization}
