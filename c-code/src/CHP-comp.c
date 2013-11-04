@@ -1,4 +1,4 @@
-#define TIME
+//#define TIME
 #define MATRIX
 
 #include "CHP-comp.h"

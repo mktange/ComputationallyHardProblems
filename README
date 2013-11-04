@@ -1,0 +1,19 @@
+== Compile ==
+
+Can be compiled with the gcc-compiler with the following command:
+
+    gcc -O3 CHP-comp.c
+
+
+== Running the program ==
+
+The program takes one argument, namely the path to the test
+file. I.e.:
+
+    ./CHP.exe testfiles/test03.uwg
+
+It can also be run by just executing the program, after which it will
+prompt you to enter the path to a test file.
+
+Output of the program will be the value of B, newline and then a
+space-seperated list of edges in the MFMST.
