@@ -1,7 +1,7 @@
 //#define TIME
 #define MATRIX
 
-#include "CHP-comp.h"
+#include "CHP.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
