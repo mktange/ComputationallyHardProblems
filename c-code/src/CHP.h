@@ -45,6 +45,8 @@ typedef struct Solution {
 // Functions
 int main(int argc, char ** argv);
 
+void *solve();
+
 char* getFilename(int argc, char ** argv);
 int readGraph(char * filename);
 

@@ -1,11 +1,13 @@
-#define TIME
+//#define TIME
 #define UF
+#define WAIT_TIME 19
 
 #include "CHP.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <pthread.h>
 
 int n, m;
 Edge * edges;
@@ -29,13 +31,32 @@ char * rank;
 short * parent;
 #endif
 
+char quit = 0;
+char * filename;
+
 int main(int argc, char ** argv) {
-	char * filename = getFilename(argc, argv);
+
+	pthread_t solveThread;
+	filename = getFilename(argc, argv);
+
+	pthread_create(&solveThread, NULL, solve, NULL);
+
+	sleep(WAIT_TIME);
+	quit = 1;
+
+	if (pthread_join(solveThread, NULL)) {
+		printSolution();
+	}
+
+	return EXIT_SUCCESS;
+}
+
+void *solve() {
 
 	if (readGraph(filename) == 0) {
 		printf("Failed to read input file: %s\n", filename);
 		fflush(stdout);
-		return EXIT_FAILURE;
+		return NULL;
 	}
 	free(filename);
 
@@ -76,7 +97,7 @@ int main(int argc, char ** argv) {
 	recursiveSolve(0, 0, 0);
 #ifdef TIME
 	end = clock();
-	printf(	"Time to find solution: %.3f\n", (double)(end-start) / CLOCKS_PER_SEC);
+	printf(	"Time spent solving: %.3f\n", (double)(end-start) / CLOCKS_PER_SEC);
 	fflush(stdout);
 #endif
 
@@ -92,10 +113,15 @@ int main(int argc, char ** argv) {
 	for (i = 0; i < n; ++i) free(edgeMatrix[i]);
 	free(edgeMatrix);
 
+	exit(0);
 	return EXIT_SUCCESS;
 }
 
 void recursiveSolve(int k, int st, int mot) {
+	if (quit) {
+		return;
+	}
+
 	// Check whether our current weight is too great,
 	// or if we have created a cycle
 #ifdef UF
@@ -143,6 +169,8 @@ void recursiveSolve(int k, int st, int mot) {
 		contracted[sorted[k]->id] = 1;
 		c_count++;
 		recursiveSolve(k+1, st+sorted[k]->w, mot+edges[m-1-sorted[k]->id].w);
+		contracted[sorted[k]->id] = 0;
+		c_count--;
 
 #ifdef UF
 		switch(type) {
@@ -158,10 +186,6 @@ void recursiveSolve(int k, int st, int mot) {
 			parent[A] = -1;
 			break;
 		}
-#endif
-		contracted[sorted[k]->id] = 0;
-		c_count--;
-#ifdef UF
 	}
 #endif
 
@@ -325,7 +349,7 @@ char* getFilename(int argc, char ** argv) {
 		scanf("%s", in);
 	}
 
-	char * filename = malloc(120 * sizeof(char));
+	filename = malloc(120 * sizeof(char));
 	strcpy(filename, in);
 
 	//strcpy(filename, "testfiles/");
