@@ -57,10 +57,10 @@ int cycleDFS(int from, int node);
 
 int isConnected(int k);
 
-#ifdef MATRIX
 int connectedDFSmatrix(int k, int node, int end);
-#else
-void connectedDFS(int k, int node);
+
+#ifdef UF
+short UFroot(int node);
 #endif
 
 // Sort

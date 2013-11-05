@@ -1,5 +1,5 @@
-//#define TIME
-#define MATRIX
+#define TIME
+#define UF
 
 #include "CHP.h"
 #include <stdio.h>
@@ -14,19 +14,20 @@ Edge ** sorted;
 Item * items;
 Item ** nbs;
 
-#ifdef MATRIX
 Edge *** edgeMatrix;
-#else
-int explored_count;
-#endif
 
 char * bestEdges;
 int bestB;
 
-char *contracted;
+char * contracted;
 int c_count;
 
-char *explored;
+char * explored;
+
+#ifdef UF
+char * rank;
+short * parent;
+#endif
 
 int main(int argc, char ** argv) {
 	char * filename = getFilename(argc, argv);
@@ -47,6 +48,16 @@ int main(int argc, char ** argv) {
 	contracted = malloc(m * sizeof(char));
 	sorted = malloc(m * sizeof(Edge*));
 	explored = malloc(n * sizeof(char));
+
+#ifdef UF
+	rank = malloc(n * sizeof(char));
+	parent = malloc(n * sizeof(short));
+
+	for (i = 0; i < n; ++i) {
+		rank[i] = 0;
+		parent[i] = -1;
+	}
+#endif
 
 	for (i = 0; i < m; ++i) {
 		contracted[i] = 0;
@@ -78,10 +89,8 @@ int main(int argc, char ** argv) {
 	free(edges);
 	free(items);
 	free(bestEdges);
-#ifdef MATRIX
 	for (i = 0; i < n; ++i) free(edgeMatrix[i]);
 	free(edgeMatrix);
-#endif
 
 	return EXIT_SUCCESS;
 }
@@ -89,9 +98,15 @@ int main(int argc, char ** argv) {
 void recursiveSolve(int k, int st, int mot) {
 	// Check whether our current weight is too great,
 	// or if we have created a cycle
+#ifdef UF
+	if (max(st,mot) >= bestB) {
+		return;
+	}
+#else
 	if (max(st,mot) >= bestB || hasCycle(k)) {
 		return;
 	}
+#endif
 
 	// Check if new best is found
 	if (c_count >= n-1) {
@@ -105,18 +120,65 @@ void recursiveSolve(int k, int st, int mot) {
 		return;
 	}
 
-	contracted[sorted[k]->id] = 1;
-	c_count++;
-	recursiveSolve(k+1, st+sorted[k]->w, mot+edges[m-1-sorted[k]->id].w);
+#ifdef UF
+	// Check Union-Find for a cycle
+	short A = UFroot(sorted[k]->n1);
+	short B = UFroot(sorted[k]->n2);
 
-	contracted[sorted[k]->id] = 0;
-	c_count--;
+	if (c_count < 1 || A != B) {
+		char type;
+		if (rank[A] == rank[B]) {
+			rank[A]++;
+			parent[B] = A;
+			type = 0;
+		} else if (rank[A] > rank[B]) {
+			parent[B] = A;
+			type = 1;
+		} else {
+			parent[A] = B;
+			type = 2;
+		}
+#endif
+
+		contracted[sorted[k]->id] = 1;
+		c_count++;
+		recursiveSolve(k+1, st+sorted[k]->w, mot+edges[m-1-sorted[k]->id].w);
+
+#ifdef UF
+		switch(type) {
+		case 0:
+			rank[A]--;
+			parent[B] = -1;
+			break;
+		case 1:
+			parent[B] = -1;
+			break;
+		default:
+		case 2:
+			parent[A] = -1;
+			break;
+		}
+#endif
+		contracted[sorted[k]->id] = 0;
+		c_count--;
+#ifdef UF
+	}
+#endif
+
+	// Perform cut
 	recursiveSolve(k+1, st, mot);
 }
 
 /**
  * Helper functions
  */
+
+#ifdef UF
+short UFroot(int node) {
+	if (parent[node] == -1) return node;
+	return UFroot(parent[node]);
+}
+#endif
 
 int hasCycle(int k) {
 	if (c_count < 1) return 0;
@@ -157,16 +219,9 @@ int isConnected(int k) {
 	for (i = 0; i < m; ++i) explored[i] = 0;
 
 	// Check if there is a cycle in the contracted set
-#ifdef MATRIX
 	return connectedDFSmatrix(k, sorted[k-1]->n1, sorted[k-1]->n2);
-#else
-	explored_count = 0;
-	connectedDFS(k, 0);
-	return explored_count == n;
-#endif
 }
 
-#ifdef MATRIX
 int connectedDFSmatrix(int k, int node, int end) {
 	if (edgeMatrix[node][end]) {
 		if (edgeMatrix[node][end]->pos >= k) return 1;
@@ -194,29 +249,6 @@ int connectedDFSmatrix(int k, int node, int end) {
 
 	return 0;
 }
-#else
-void connectedDFS(int k, int node) {
-	explored[node] = 1;
-	explored_count++;
-
-	Item * item = nbs[node];
-	while (item != NULL) {
-		int other = getOther(node, item->e);
-		if (explored[other] == 1) {
-			item = item->next;
-			continue;
-		}
-
-		if (item->e->pos < k && contracted[item->e->id] == 0) {
-			item = item->next;
-			continue;
-		}
-
-		connectedDFS(k, other);
-		item = item->next;
-	}
-}
-#endif
 
 int getOther(int node, Edge * e) {
 	if (e == NULL) return -1;
@@ -243,13 +275,11 @@ int readGraph(char * filename){
 	nbs = malloc(n * sizeof(Item*));
 
 	int i;
-#ifdef MATRIX
 	edgeMatrix = malloc(n * sizeof(Edge**));
 	for (i = 0; i < n; ++i)	{
 		edgeMatrix[i] = malloc(n * sizeof(Edge*));
 		memset(edgeMatrix[i], 0, n*sizeof(Edge*));
 	}
-#endif
 
 	int n1, n2, w;
 	items = malloc(2*m * sizeof(Item));
@@ -266,10 +296,8 @@ int readGraph(char * filename){
 			edges[m-i-1].h1 = h;
 		}
 
-#ifdef MATRIX
 		edgeMatrix[n1-1][n2-1] = &edges[i];
 		edgeMatrix[n2-1][n1-1] = &edges[i];
-#endif
 
 		items[i].e = &edges[i];
 		items[i].next = nbs[n1-1];
