@@ -240,7 +240,7 @@ int isConnected(int k) {
 
 	// Reset explored set
 	int i;
-	for (i = 0; i < m; ++i) explored[i] = 0;
+	for (i = 0; i < n; ++i) explored[i] = 0;
 
 	// Check if there is a cycle in the contracted set
 	return connectedDFSmatrix(k, sorted[k-1]->n1, sorted[k-1]->n2);
@@ -349,7 +349,7 @@ char* getFilename(int argc, char ** argv) {
 		scanf("%s", in);
 	}
 
-	filename = malloc(120 * sizeof(char));
+	filename = malloc(200 * sizeof(char));
 	strcpy(filename, in);
 
 	//strcpy(filename, "testfiles/");
