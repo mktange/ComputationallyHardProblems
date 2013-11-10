@@ -209,7 +209,7 @@ int hasCycle(int k) {
 
 	// Reset explored set
 	int i;
-	for (i = 0; i < m; ++i) explored[i] = 0;
+	for (i = 0; i < n; ++i) explored[i] = 0;
 
 	// Check if there is a cycle in the contracted set
 	return cycleDFS(-1, sorted[k-1]->n1);
